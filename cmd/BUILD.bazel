@@ -5,12 +5,14 @@ go_library(
     srcs = [
         "disk.go",
         "root.go",
+        "s3.go",
     ],
     importpath = "github.com/dmorgan81/buzzel/cmd",
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/cache",
         "//pkg/cache/disk",
+        "//pkg/cache/s3",
         "@com_github_rs_zerolog//:zerolog",
         "@com_github_rs_zerolog//log",
         "@com_github_spf13_cobra//:cobra",

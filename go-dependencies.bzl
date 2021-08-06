@@ -32,6 +32,85 @@ def go_dependencies():
         version = "v0.0.0-20180808171621-7fddfc383310",
     )
     go_repository(
+        name = "com_github_aws_aws_sdk_go_v2",
+        importpath = "github.com/aws/aws-sdk-go-v2",
+        sum = "h1:HcN6yDnHV9S7D69E7To0aUppJhiJNEzQSNcUxc7r3qo=",
+        version = "v1.8.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_config",
+        importpath = "github.com/aws/aws-sdk-go-v2/config",
+        sum = "h1:rtoCnNObhVm7me+v9sA2aY+NtHNZjjWWC3ifXVci+wE=",
+        version = "v1.6.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_credentials",
+        importpath = "github.com/aws/aws-sdk-go-v2/credentials",
+        sum = "h1:Uud/fZzm0lqqhE8kvXYJFAJ3PGnagKoUcvHq1hXfBZw=",
+        version = "v1.3.2",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_feature_ec2_imds",
+        importpath = "github.com/aws/aws-sdk-go-v2/feature/ec2/imds",
+        sum = "h1:SGqDJun6tydgsSIFxv9+EYBJVqVUwg2QMJp6PbNq8C8=",
+        version = "v1.4.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_feature_s3_manager",
+        importpath = "github.com/aws/aws-sdk-go-v2/feature/s3/manager",
+        sum = "h1:Iqp2aHeRF3kaaNuDS82bHBzER285NM6lLPAgsxHCR2A=",
+        version = "v1.4.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_internal_ini",
+        importpath = "github.com/aws/aws-sdk-go-v2/internal/ini",
+        sum = "h1:xu45foJnwMwBqSkIMKyJP9kbyHi5hdhZ/WiJ7D2sHZ0=",
+        version = "v1.2.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_internal_accept_encoding",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding",
+        sum = "h1:YcGVEqLQGHDa81776C3daai6ZkkRGf/8RAQ07hV0QcU=",
+        version = "v1.2.2",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_internal_presigned_url",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/internal/presigned-url",
+        sum = "h1:Xv1rGYgsRRn0xw9JFNnfpBMZam54PrWpC4rJOJ9koA8=",
+        version = "v1.2.2",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_internal_s3shared",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/internal/s3shared",
+        sum = "h1:ewIpdVz12MDinJJB/nu1uUiFIWFnvtd3iV7cEW7lR+M=",
+        version = "v1.5.2",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_s3",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/s3",
+        sum = "h1:cxZbzTYXgiQrZ6u2/RJZAkkgZssqYOdydvJPBgIHlsM=",
+        version = "v1.12.0",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_sso",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/sso",
+        sum = "h1:b+U3WrF9ON3f32FH19geqmiod4uKcMv/q+wosQjjyyM=",
+        version = "v1.3.2",
+    )
+    go_repository(
+        name = "com_github_aws_aws_sdk_go_v2_service_sts",
+        importpath = "github.com/aws/aws-sdk-go-v2/service/sts",
+        sum = "h1:1Pls85C5CFjhE3aH+h85/hyAk89kQNlAWlEQtIkaFyc=",
+        version = "v1.6.1",
+    )
+    go_repository(
+        name = "com_github_aws_smithy_go",
+        importpath = "github.com/aws/smithy-go",
+        sum = "h1:+cLHMRrDZvQ4wk+KuQ9yH6eEg6KZEJ9RI2IkDqnygCg=",
+        version = "v1.7.0",
+    )
+
+    go_repository(
         name = "com_github_bgentry_speakeasy",
         importpath = "github.com/bgentry/speakeasy",
         sum = "h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=",
@@ -202,8 +281,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_google_go_cmp",
         importpath = "github.com/google/go-cmp",
-        sum = "h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=",
-        version = "v0.5.5",
+        sum = "h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=",
+        version = "v0.5.6",
     )
     go_repository(
         name = "com_github_google_gofuzz",
@@ -379,6 +458,19 @@ def go_dependencies():
         sum = "h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=",
         version = "v1.0.0",
     )
+    go_repository(
+        name = "com_github_jmespath_go_jmespath",
+        importpath = "github.com/jmespath/go-jmespath",
+        sum = "h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=",
+        version = "v0.4.0",
+    )
+    go_repository(
+        name = "com_github_jmespath_go_jmespath_internal_testify",
+        importpath = "github.com/jmespath/go-jmespath/internal/testify",
+        sum = "h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=",
+        version = "v1.5.1",
+    )
+
     go_repository(
         name = "com_github_json_iterator_go",
         importpath = "github.com/json-iterator/go",
@@ -894,8 +986,8 @@ def go_dependencies():
     go_repository(
         name = "org_golang_x_text",
         importpath = "golang.org/x/text",
-        sum = "h1:i6eZZ+zk0SOf0xgBpEpPD18qWcJda6q1sxt3S0kzyUQ=",
-        version = "v0.3.5",
+        sum = "h1:aRYxNxv6iGQlyVaZmk6ZgYEDa+Jg18DxebPSrd6bg1M=",
+        version = "v0.3.6",
     )
     go_repository(
         name = "org_golang_x_time",

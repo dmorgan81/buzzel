@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "s3",
+    srcs = ["s3.go"],
+    importpath = "github.com/dmorgan81/buzzel/pkg/cache/s3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/cache",
+        "@com_github_aws_aws_sdk_go_v2//aws",
+        "@com_github_aws_aws_sdk_go_v2//aws/transport/http",
+        "@com_github_aws_aws_sdk_go_v2_config//:config",
+        "@com_github_aws_aws_sdk_go_v2_feature_s3_manager//:manager",
+        "@com_github_aws_aws_sdk_go_v2_service_s3//:s3",
+        "@com_github_aws_aws_sdk_go_v2_service_s3//types",
+        "@com_github_rs_zerolog//:zerolog",
+        "@com_github_rs_zerolog//log",
+    ],
+)
