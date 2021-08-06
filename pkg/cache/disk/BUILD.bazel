@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "disk",
+    srcs = ["disk.go"],
+    importpath = "github.com/dmorgan81/buzzel/pkg/cache/disk",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/cache",
+        "@com_github_rs_zerolog//:zerolog",
+    ],
+)

@@ -398,6 +398,13 @@ def go_dependencies():
         version = "v4.20.0+incompatible",
     )
     go_repository(
+        name = "com_github_justinas_alice",
+        importpath = "github.com/justinas/alice",
+        sum = "h1:+MHSA/vccVCF4Uq37S42jwlkvI2Xzl7zTPCN5BnZNVo=",
+        version = "v1.2.0",
+    )
+
+    go_repository(
         name = "com_github_kisielk_errcheck",
         importpath = "github.com/kisielk/errcheck",
         sum = "h1:e8esj/e4R+SAOwFwN+n3zr0nYeCyeweozKfO23MvHzY=",
@@ -505,6 +512,13 @@ def go_dependencies():
         sum = "h1:9f412s+6RmYXLWZSEzVVgPGK7C2PphHj5RJrvfx9AWI=",
         version = "v1.0.1",
     )
+    go_repository(
+        name = "com_github_nytimes_gziphandler",
+        importpath = "github.com/NYTimes/gziphandler",
+        sum = "h1:ZUDjpQae29j0ryrS0u/B8HZfJBtBQHjqw2rQ2cqUQ3I=",
+        version = "v1.1.1",
+    )
+
     go_repository(
         name = "com_github_pascaldekloe_goe",
         importpath = "github.com/pascaldekloe/goe",

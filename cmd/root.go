@@ -16,8 +16,14 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
+	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
+	"github.com/dmorgan81/buzzel/pkg/cache"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -27,7 +33,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use: "buzzel",
-	PreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		level, err := zerolog.ParseLevel(viper.GetString("log.level"))
 		if err != nil {
 			return err
@@ -40,9 +46,31 @@ var rootCmd = &cobra.Command{
 
 		return nil
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
-	},
+}
+
+func runServer(c cache.Cache) error {
+	addr := viper.GetString("cache.addr")
+	log.Info().Str("addr", addr)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+
+	errs := make(chan error, 1)
+	s := cache.NewServer(addr, c)
+	go func() {
+		log.Info().Msg("starting cache server")
+		if err := s.ListenAndServe(); err != http.ErrServerClosed {
+			errs <- err
+		}
+	}()
+
+	select {
+	case err := <-errs:
+		return err
+	case <-sigs:
+	}
+	log.Info().Msg("stopping cache server")
+	return s.Shutdown(context.TODO())
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -54,9 +82,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	flags := rootCmd.Flags()
+	flags := rootCmd.PersistentFlags()
 	flags.String("log.level", "info", "")
 	flags.Bool("log.pretty", true, "")
+	flags.String("cache.addr", ":8080", "")
 
 	viper.BindPFlags(flags)
 }
