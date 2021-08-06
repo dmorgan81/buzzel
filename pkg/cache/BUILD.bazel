@@ -4,6 +4,7 @@ go_library(
     name = "cache",
     srcs = [
         "cache.go",
+        "lru.go",
         "server.go",
     ],
     importpath = "github.com/dmorgan81/buzzel/pkg/cache",
@@ -11,6 +12,7 @@ go_library(
     deps = [
         "@com_github_justinas_alice//:alice",
         "@com_github_nytimes_gziphandler//:gziphandler",
+        "@com_github_rs_zerolog//:zerolog",
         "@com_github_rs_zerolog//hlog",
         "@com_github_rs_zerolog//log",
     ],

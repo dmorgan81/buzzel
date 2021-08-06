@@ -42,6 +42,9 @@ var rootCmd = &cobra.Command{
 
 		if viper.GetBool("log.pretty") {
 			log.Logger = log.Output(zerolog.NewConsoleWriter())
+		} else {
+			zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+			log.Logger = log.Output(os.Stdout)
 		}
 
 		return nil
@@ -50,7 +53,12 @@ var rootCmd = &cobra.Command{
 
 func runServer(c cache.Cache) error {
 	addr := viper.GetString("cache.addr")
-	log.Info().Str("addr", addr)
+	size := viper.GetSizeInBytes("cache.mem.size")
+	log.Info().Str("addr", addr).Str("size", viper.GetString("cache.mem.size")).Send()
+
+	if size > 0 {
+		c = cache.NewLRUCache(c, int64(size))
+	}
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
@@ -86,6 +94,7 @@ func init() {
 	flags.String("log.level", "info", "")
 	flags.Bool("log.pretty", true, "")
 	flags.String("cache.addr", ":8080", "")
+	flags.String("cache.mem.size", "256mb", "")
 
 	viper.BindPFlags(flags)
 }

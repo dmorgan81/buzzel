@@ -23,12 +23,20 @@ import (
 
 type Store string
 
+func (s Store) String() string {
+	return string(s)
+}
+
 const (
 	AC  Store = "ac"
 	CAS Store = "cas"
 )
 
 type Key string
+
+func (k Key) String() string {
+	return string(k)
+}
 
 type Cache interface {
 	Exists(context.Context, Store, Key) error

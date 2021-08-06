@@ -161,8 +161,8 @@ func (h *handler) put(w http.ResponseWriter, r *http.Request) {
 		handleHttpError(w, r, err)
 	} else {
 		hlog.FromRequest(r).Debug().Caller().
-			Str("store", string(store)).
-			Str("key", string(key)).
+			Stringer("store", store).
+			Stringer("key", key).
 			Int64("size", written).
 			Send()
 	}
