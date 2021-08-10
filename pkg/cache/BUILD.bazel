@@ -11,6 +11,7 @@ go_library(
     importpath = "github.com/dmorgan81/buzzel/pkg/cache",
     visibility = ["//visibility:public"],
     deps = [
+        "@com_github_etherlabsio_healthcheck_v2//:healthcheck",
         "@com_github_justinas_alice//:alice",
         "@com_github_nytimes_gziphandler//:gziphandler",
         "@com_github_rs_zerolog//:zerolog",

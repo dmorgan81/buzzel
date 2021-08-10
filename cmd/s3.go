@@ -35,7 +35,7 @@ var s3Cmd = &cobra.Command{
 		}
 		log.Info().Str("cache bucket", bucket).Send()
 
-		cache, err := s3.NewS3Cache(bucket)
+		cache, err := s3.NewCache(bucket)
 		if err != nil {
 			return err
 		}

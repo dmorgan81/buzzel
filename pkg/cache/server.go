@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/gziphandler"
+	health "github.com/etherlabsio/healthcheck/v2"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
@@ -44,6 +45,13 @@ func NewServer(addr string, cache Cache) *http.Server {
 	mux := http.NewServeMux()
 	mux.Handle("/ac/", chain.Then(&handler{Cache: cache, store: AC}))
 	mux.Handle("/cas/", chain.Then(&handler{Cache: cache, store: CAS}))
+
+	if checker, ok := cache.(health.Checker); ok {
+		mux.Handle("/healthz", health.Handler(health.WithChecker("cache", checker)))
+	} else {
+		mux.Handle("/healthz", health.Handler())
+	}
+
 	return &http.Server{Addr: addr, Handler: mux}
 }
 

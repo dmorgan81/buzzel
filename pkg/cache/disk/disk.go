@@ -23,6 +23,8 @@ import (
 	"path/filepath"
 
 	"github.com/dmorgan81/buzzel/pkg/cache"
+	health "github.com/etherlabsio/healthcheck/v2"
+	"github.com/etherlabsio/healthcheck/v2/checkers"
 	"github.com/rs/zerolog"
 )
 
@@ -82,4 +84,10 @@ func (c Cache) Writer(ctx context.Context, store cache.Store, key cache.Key) (io
 	}
 
 	return os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+}
+
+var _ health.Checker = Cache("")
+
+func (c Cache) Check(ctx context.Context) error {
+	return checkers.DiskSpace(string(c), 90).Check(ctx)
 }

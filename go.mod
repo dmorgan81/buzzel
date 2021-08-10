@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.6.0
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.4.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.12.0
+	github.com/etherlabsio/healthcheck/v2 v2.0.0
 	github.com/justinas/alice v1.2.0
 	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cobra v1.2.1

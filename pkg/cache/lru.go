@@ -23,6 +23,7 @@ import (
 	"path"
 	"sync"
 
+	health "github.com/etherlabsio/healthcheck/v2"
 	"github.com/rs/zerolog"
 )
 
@@ -153,4 +154,13 @@ func (c *LRU) Reader(ctx context.Context, store Store, key Key) (io.Reader, int6
 
 func (c *LRU) Writer(ctx context.Context, store Store, key Key) (io.Writer, error) {
 	return c.cache.Writer(ctx, store, key)
+}
+
+var _ health.Checker = &LRU{}
+
+func (c *LRU) Check(ctx context.Context) error {
+	if checker, ok := c.cache.(health.Checker); ok {
+		return checker.Check(ctx)
+	}
+	return nil
 }

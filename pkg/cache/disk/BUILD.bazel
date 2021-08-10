@@ -7,6 +7,8 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/cache",
+        "@com_github_etherlabsio_healthcheck_v2//:healthcheck",
+        "@com_github_etherlabsio_healthcheck_v2//checkers",
         "@com_github_rs_zerolog//:zerolog",
     ],
 )

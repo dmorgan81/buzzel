@@ -29,19 +29,20 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/dmorgan81/buzzel/pkg/cache"
+	health "github.com/etherlabsio/healthcheck/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-type S3Cache struct {
+type Cache struct {
 	bucket  string
 	client  *s3.Client
 	uploads chan *s3.PutObjectInput
 }
 
-var _ cache.Cache = &S3Cache{}
+var _ cache.Cache = &Cache{}
 
-func NewS3Cache(bucket string) (*S3Cache, error) {
+func NewCache(bucket string) (*Cache, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return nil, err
@@ -66,14 +67,14 @@ func NewS3Cache(bucket string) (*S3Cache, error) {
 		}
 	}()
 
-	return &S3Cache{bucket, client, uploads}, nil
+	return &Cache{bucket, client, uploads}, nil
 }
 
 func resolve(store cache.Store, key cache.Key) string {
 	return path.Join(string(store), string(key))
 }
 
-func (c *S3Cache) Exists(ctx context.Context, store cache.Store, key cache.Key) error {
+func (c *Cache) Exists(ctx context.Context, store cache.Store, key cache.Key) error {
 	path := resolve(store, key)
 	log := zerolog.Ctx(ctx).With().Caller().Logger()
 	log.Debug().Str("path", path).Send()
@@ -91,7 +92,7 @@ func (c *S3Cache) Exists(ctx context.Context, store cache.Store, key cache.Key) 
 	return nil
 }
 
-func (c *S3Cache) Reader(ctx context.Context, store cache.Store, key cache.Key) (io.Reader, int64, error) {
+func (c *Cache) Reader(ctx context.Context, store cache.Store, key cache.Key) (io.Reader, int64, error) {
 	path := resolve(store, key)
 	log := zerolog.Ctx(ctx).With().Caller().Logger()
 	log.Debug().Str("path", path).Send()
@@ -111,7 +112,7 @@ func (c *S3Cache) Reader(ctx context.Context, store cache.Store, key cache.Key) 
 	return out.Body, out.ContentLength, nil
 }
 
-func (c *S3Cache) Writer(ctx context.Context, store cache.Store, key cache.Key) (io.Writer, error) {
+func (c *Cache) Writer(ctx context.Context, store cache.Store, key cache.Key) (io.Writer, error) {
 	path := resolve(store, key)
 	log := zerolog.Ctx(ctx).With().Caller().Logger()
 	log.Debug().Str("path", path).Send()
@@ -124,4 +125,11 @@ func (c *S3Cache) Writer(ctx context.Context, store cache.Store, key cache.Key) 
 		Body:        pr,
 	}
 	return pw, nil
+}
+
+var _ health.Checker = &Cache{}
+
+func (c *Cache) Check(ctx context.Context) error {
+	_, err := c.client.HeadBucket(ctx, &s3.HeadBucketInput{Bucket: aws.String(c.bucket)})
+	return err
 }
