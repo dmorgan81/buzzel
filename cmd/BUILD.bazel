@@ -4,6 +4,7 @@ go_library(
     name = "cmd",
     srcs = [
         "disk.go",
+        "mem.go",
         "root.go",
         "s3.go",
     ],
