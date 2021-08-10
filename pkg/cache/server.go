@@ -19,9 +19,9 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"net/url"
+	"path"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/NYTimes/gziphandler"
@@ -42,12 +42,14 @@ func NewServer(addr string, cache Cache) *http.Server {
 			Msg("")
 	}))
 	mux := http.NewServeMux()
-	mux.Handle("/", chain.Then(&handler{Cache: cache}))
+	mux.Handle("/ac/", chain.Then(&handler{Cache: cache, store: AC}))
+	mux.Handle("/cas/", chain.Then(&handler{Cache: cache, store: CAS}))
 	return &http.Server{Addr: addr, Handler: mux}
 }
 
 type handler struct {
 	Cache
+	store Store
 }
 
 var _ http.Handler = &handler{}
@@ -65,30 +67,15 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func parseRequestURL(url *url.URL) (Store, Key, error) {
-	path := url.Path
-	if strings.HasPrefix(path, "/ac/") || strings.HasPrefix(path, "/cas/") {
-		path = path[1:]
+var sha256 = regexp.MustCompile("^[a-f0-9]{64}$")
 
-		parts := strings.Split(path, "/")
-		if len(parts) != 2 {
-			return "", "", ErrNotFound
-		}
-
-		var store Store
-		if parts[0] == string(AC) {
-			store = AC
-		} else if parts[0] == string(CAS) {
-			store = CAS
-		} else {
-			return "", "", ErrNotFound
-		}
-
-		key := parts[1]
-		key = key[:2] + "/" + key
-		return store, Key(key), nil
+func keyFromRequest(r *http.Request) (Key, error) {
+	p := path.Base(r.URL.Path)
+	if !sha256.Match([]byte(p)) {
+		return "", ErrNotFound
 	}
-	return "", "", ErrNotFound
+	p = p[:2] + "/" + p
+	return Key(p), nil
 }
 
 func handleHttpError(w http.ResponseWriter, r *http.Request, err error) {
@@ -101,30 +88,28 @@ func handleHttpError(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func (h *handler) head(w http.ResponseWriter, r *http.Request) {
-	store, key, err := parseRequestURL(r.URL)
+	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
-		return
 	}
 
-	if err := h.Exists(r.Context(), store, key); err != nil {
+	if err := h.Exists(r.Context(), h.store, key); err != nil {
 		handleHttpError(w, r, err)
 	}
 }
 
 func (h *handler) get(w http.ResponseWriter, r *http.Request) {
-	store, key, err := parseRequestURL(r.URL)
+	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
-		return
 	}
 
-	if err := h.Exists(r.Context(), store, key); err != nil {
+	if err := h.Exists(r.Context(), h.store, key); err != nil {
 		handleHttpError(w, r, err)
 		return
 	}
 
-	reader, size, err := h.Reader(r.Context(), store, key)
+	reader, size, err := h.Reader(r.Context(), h.store, key)
 	if err != nil {
 		handleHttpError(w, r, err)
 		return
@@ -142,13 +127,12 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) put(w http.ResponseWriter, r *http.Request) {
-	store, key, err := parseRequestURL(r.URL)
+	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
-		return
 	}
 
-	writer, err := h.Writer(r.Context(), store, key)
+	writer, err := h.Writer(r.Context(), h.store, key)
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		handleHttpError(w, r, err)
 		return
@@ -161,7 +145,7 @@ func (h *handler) put(w http.ResponseWriter, r *http.Request) {
 		handleHttpError(w, r, err)
 	} else {
 		hlog.FromRequest(r).Debug().Caller().
-			Stringer("store", store).
+			Stringer("store", h.store).
 			Stringer("key", key).
 			Int64("size", written).
 			Send()
