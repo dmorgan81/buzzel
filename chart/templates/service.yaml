@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "buzzel.fullname" . }}
+  labels:
+    {{- include "buzzel.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "buzzel.selectorLabels" . | nindent 4 }}
+---
+{{- if .Values.buzzel.cache.disk.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "buzzel.fullname" . }}-headless
+  labels:
+    {{- include "buzzel.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "buzzel.selectorLabels" . | nindent 4 }}
+{{- end }}

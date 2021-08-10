@@ -1,0 +1,6 @@
+load("@com_github_deviavir_rules_helm//helm:helm.bzl", "helm_chart")
+
+helm_chart(
+    name = "buzzel",
+    srcs = glob(["**"]),
+)

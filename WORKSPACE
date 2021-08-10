@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "io_bazel_rules_go",
@@ -23,6 +24,13 @@ http_archive(
         "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
         "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
     ],
+)
+
+git_repository(
+    name = "com_github_deviavir_rules_helm",
+    commit = "a4c77f6422669ac1d1123c7800947fa1f968faed",
+    shallow_since = "1600971629 +0200",
+    remote = "https://github.com/deviavir/rules_helm.git",
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -51,3 +59,7 @@ gazelle_dependencies()
 load("@io_bazel_rules_docker//go:image.bzl", go_image_repos = "repositories")
 
 go_image_repos()
+
+load("@com_github_deviavir_rules_helm//:repos.bzl", "helm_repositories")
+
+helm_repositories()

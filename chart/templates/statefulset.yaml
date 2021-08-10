@@ -1,0 +1,84 @@
+{{- if .Values.buzzel.cache.disk.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "buzzel.fullname" . }}
+  labels:
+    {{- include "buzzel.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  serviceName: {{ include "buzzel.fullname" . }}-headless
+  selector:
+    matchLabels:
+      {{- include "buzzel.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "buzzel.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "buzzel.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          args:
+          - disk
+          env:
+          - name: BUZZEL_LOG_LEVEL
+            value: {{ .Values.buzzel.log.level }}
+          - name: BUZZEL_LOG_PRETTY
+            value: {{ .Values.buzzel.log.pretty | quote }}
+          - name: BUZZEL_CACHE_DISK_DIR
+            value: {{ .Values.buzzel.cache.disk.dir }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: {{ .Values.buzzel.cache.disk.dir }}
+            name: {{ include "buzzel.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "buzzel.fullname" . }}
+      labels:
+        {{- include "buzzel.labels" . | nindent 8 }}
+    spec:
+      {{- toYaml .Values.buzzel.cache.disk.volumeClaimTemplate | nindent 6 }}
+
+{{- end }}

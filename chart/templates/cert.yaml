@@ -1,0 +1,10 @@
+{{- if .Values.cert.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "buzzel.fullname" . }}
+  labels:
+    {{- include "buzzel.labels" . | nindent 4 }}
+spec:
+  {{- toYaml .Values.cert.spec | nindent 2 }}
+{{- end }}
