@@ -60,6 +60,15 @@ func (c *LRU) touch(store Store, key Key) ([]byte, bool) {
 	return nil, false
 }
 
+func (c *LRU) evict(store Store, key Key) {
+	path := resolve(store, key)
+	if el, ok := c.mp[path]; ok {
+		en := c.ll.Remove(el).(*entry)
+		delete(c.mp, path)
+		c.size -= int64(len(en.data))
+	}
+}
+
 func (c *LRU) pop() (Store, Key, []byte) {
 	en := c.ll.Remove(c.ll.Back()).(*entry)
 	delete(c.mp, resolve(en.store, en.key))
@@ -153,6 +162,9 @@ func (c *LRU) Reader(ctx context.Context, store Store, key Key) (io.Reader, int6
 }
 
 func (c *LRU) Writer(ctx context.Context, store Store, key Key) (io.Writer, error) {
+	c.lock.Lock()
+	c.evict(store, key)
+	c.lock.Unlock()
 	return c.cache.Writer(ctx, store, key)
 }
 
