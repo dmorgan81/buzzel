@@ -1,0 +1,31 @@
+name: Buzzel
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/cache@v2.1.4
+      env:
+        cache-name: bazel-cache
+      with:
+        path: |
+          ~/.cache/bazelisk
+          ~/.cache/bazel
+        key: ${{ runner.os }}-${{ env.cache-name }}
+
+    - uses: actions/checkout@v2
+
+    - name: Setup bazelisk for Bazel builds
+      uses: holvonix-open/setup-bazelisk@v0.6.1
+
+    - name: Build
+      run: bazel build //...
+
+    - name: Test
+      run: bazel test //...
