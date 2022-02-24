@@ -128,8 +128,9 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/octect-stream")
 	if size == 0 {
 		w.WriteHeader(http.StatusOK)
+	} else {
+		io.Copy(w, io.LimitReader(reader, size))
 	}
-	io.Copy(w, reader)
 }
 
 func (h *handler) put(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +149,7 @@ func (h *handler) put(w http.ResponseWriter, r *http.Request) {
 		defer closer.Close()
 	}
 
-	if written, err := io.Copy(writer, r.Body); err != nil {
+	if written, err := io.Copy(writer, io.LimitReader(r.Body, r.ContentLength)); err != nil {
 		handleHttpError(w, r, err)
 		return
 	} else {
