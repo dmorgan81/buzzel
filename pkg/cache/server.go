@@ -90,7 +90,7 @@ func handleHttpError(w http.ResponseWriter, r *http.Request, err error) {
 	if errors.Is(err, ErrNotFound) {
 		w.WriteHeader(http.StatusNotFound)
 	} else {
-		hlog.FromRequest(r).Err(err).Stack().Send()
+		hlog.FromRequest(r).Err(err).Send()
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

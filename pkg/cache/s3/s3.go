@@ -62,7 +62,7 @@ func NewCache(bucket string) (*Cache, error) {
 		uploader := manager.NewUploader(client)
 		for in := range uploads {
 			if _, err := uploader.Upload(context.TODO(), in); err != nil {
-				log.Logger.Error().Err(err).Stack().Send()
+				log.Logger.Err(err).Send()
 			}
 		}
 	}()
