@@ -61,6 +61,11 @@ func (c Cache) Reader(ctx context.Context, store cache.Store, key cache.Key) (io
 	log := zerolog.Ctx(ctx).With().Caller().Logger()
 	log.Debug().Str("path", path).Send()
 
+	_, err := os.Stat(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, -1, cache.ErrNotFound
+	}
+
 	file, err := os.OpenFile(path, os.O_RDONLY, 0600)
 	if err != nil {
 		return nil, -1, err

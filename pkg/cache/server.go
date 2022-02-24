@@ -112,10 +112,6 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
-	}
-
-	if err := h.Exists(r.Context(), h.store, key); err != nil {
-		handleHttpError(w, r, err)
 		return
 	}
 
