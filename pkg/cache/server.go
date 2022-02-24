@@ -99,10 +99,12 @@ func (h *handler) head(w http.ResponseWriter, r *http.Request) {
 	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
+		return
 	}
 
 	if err := h.Exists(r.Context(), h.store, key); err != nil {
 		handleHttpError(w, r, err)
+		return
 	}
 }
 
@@ -138,6 +140,7 @@ func (h *handler) put(w http.ResponseWriter, r *http.Request) {
 	key, err := keyFromRequest(r)
 	if err != nil {
 		handleHttpError(w, r, err)
+		return
 	}
 
 	writer, err := h.Writer(r.Context(), h.store, key)
@@ -151,6 +154,7 @@ func (h *handler) put(w http.ResponseWriter, r *http.Request) {
 
 	if written, err := io.Copy(writer, r.Body); err != nil {
 		handleHttpError(w, r, err)
+		return
 	} else {
 		hlog.FromRequest(r).Debug().Caller().
 			Stringer("store", h.store).
