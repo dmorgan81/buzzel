@@ -37,7 +37,12 @@ import (
 type Cache struct {
 	bucket  string
 	client  *s3.Client
-	uploads chan *s3.PutObjectInput
+	uploads chan *upload
+}
+
+type upload struct {
+	ctx context.Context
+	in  *s3.PutObjectInput
 }
 
 var _ cache.Cache = &Cache{}
@@ -57,12 +62,15 @@ func NewCache(bucket string) (*Cache, error) {
 		return nil, err
 	}
 
-	uploads := make(chan *s3.PutObjectInput)
+	uploads := make(chan *upload)
 	go func() {
 		uploader := manager.NewUploader(client)
-		for in := range uploads {
-			if _, err := uploader.Upload(context.TODO(), in); err != nil {
-				log.Logger.Err(err).Send()
+		for upload := range uploads {
+			// we don't want to use the upload ctx because the actual
+			// upload to S3 is asynchronous from the client's POV
+			if _, err := uploader.Upload(context.TODO(), upload.in); err != nil {
+				log := zerolog.Ctx(upload.ctx).With().Caller().Logger()
+				log.Err(err).Send()
 			}
 		}
 	}()
@@ -118,11 +126,14 @@ func (c *Cache) Writer(ctx context.Context, store cache.Store, key cache.Key) (i
 	log.Debug().Str("path", path).Send()
 
 	pr, pw := io.Pipe()
-	c.uploads <- &s3.PutObjectInput{
-		Bucket:      aws.String(c.bucket),
-		Key:         aws.String(path),
-		ContentType: aws.String("application/octect-stream"),
-		Body:        pr,
+	c.uploads <- &upload{
+		ctx: ctx,
+		in: &s3.PutObjectInput{
+			Bucket:      aws.String(c.bucket),
+			Key:         aws.String(path),
+			ContentType: aws.String("application/octect-stream"),
+			Body:        pr,
+		},
 	}
 	return pw, nil
 }
